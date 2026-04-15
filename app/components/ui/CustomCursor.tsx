@@ -37,15 +37,19 @@ export function CustomCursor() {
 
   return (
     <>
-      {/* Main cursor */}
+      {/* Main cursor - Beating heart */}
       <motion.div
-        className="fixed w-6 h-6 pointer-events-none z-[9999]"
-        animate={{ x: mousePos.x - 12, y: mousePos.y - 12 }}
+        className="fixed w-8 h-8 pointer-events-none z-[9999]"
+        animate={{ x: mousePos.x - 16, y: mousePos.y - 16 }}
         transition={{ type: 'spring', stiffness: 600, damping: 30, mass: 0.5 }}
       >
-        <div className="w-full h-full rounded-full bg-gradient-to-r from-[#ff6b9d] to-[#ffd700] shadow-lg shadow-[#ff6b9d] flex items-center justify-center text-white text-xs">
+        <motion.div
+          className="w-full h-full rounded-full bg-gradient-to-r from-[#ff6b9d] to-[#ffd700] shadow-lg shadow-[#ff6b9d] flex items-center justify-center text-2xl"
+          animate={{ scale: [1, 1.3, 1] }}
+          transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut' }}
+        >
           ❤️
-        </div>
+        </motion.div>
       </motion.div>
 
       {/* Trail hearts */}
