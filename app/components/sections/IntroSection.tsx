@@ -137,7 +137,7 @@ export function IntroSection() {
       nameRef.current.innerHTML = '';
       
       // Split text into two lines
-      const line1Text = `Happy Birthday Baby! 🎉`;
+      const line1Text = `Happy Birthday Baby! `;
       const line2Text = `The one most beautiful girl in my life ✨`;
       
       // Create line 1

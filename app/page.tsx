@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Lenis from '@studio-freight/lenis';
 import { gsap, ScrollTrigger } from '@/lib/gsap';
-import { CustomCursor, PageProgress, AudioPlayer } from '@/components/ui';
+import { CustomCursor, AudioPlayer } from '@/components/ui';
 import { DebugPanel } from '@/components/ui/DebugPanel';
 import {
   IntroSection,
@@ -74,7 +74,6 @@ export default function Home() {
     <main className="w-screen bg-[#0a0008] overflow-x-hidden">
       <DebugPanel />
       <CustomCursor />
-      <PageProgress />
       <AudioPlayer musicUrl={config.musicUrl} />
 
       {/* All sections stacked vertically */}

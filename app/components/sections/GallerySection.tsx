@@ -93,7 +93,6 @@ export function GallerySection() {
             </div>
           )}
         </div>
-
         {/* Lightbox */}
         <AnimatePresence>
           {selectedId !== null && (
