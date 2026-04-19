@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Lenis from '@studio-freight/lenis';
 import { gsap, ScrollTrigger } from '@/lib/gsap';
-import { CustomCursor, AudioPlayer } from '@/components/ui';
+import { CustomCursor, AudioPlayer, PageLoader } from '@/components/ui';
 import { DebugPanel } from '@/components/ui/DebugPanel';
 import {
   IntroSection,
@@ -18,6 +18,7 @@ import { config } from '@/config';
 
 export default function Home() {
   const lenisRef = useRef<Lenis | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     console.log('🚀 Initializing page...');
@@ -53,7 +54,9 @@ export default function Home() {
     const refreshTimout = setTimeout(() => {
       console.log('🔄 ScrollTrigger refresh called');
       ScrollTrigger.refresh();
-    }, 50);
+      // Hide loader after 2.5 seconds
+      setIsLoading(false);
+    }, 2500);
 
     const handleResize = () => {
       console.log('📐 Window resized, refreshing ScrollTrigger');
@@ -72,17 +75,26 @@ export default function Home() {
 
   return (
     <main className="w-screen bg-[#0a0008] overflow-x-hidden">
-      <DebugPanel />
-      <CustomCursor />
-      <AudioPlayer musicUrl={config.musicUrl} />
+      <AnimatePresence mode="wait">
+        {isLoading && <PageLoader key="loader" isLoading={isLoading} />}
+      </AnimatePresence>
 
-      {/* All sections stacked vertically */}
-      <IntroSection key="intro" />
-      {config.memories.length > 0 && <TimelineSection key="timeline" />}
-      {config.loveReasons.length > 0 && <StarsSection key="stars" />}
-      {config.photos.length > 0 && <GallerySection key="gallery" />}
-      {config.letterContent && <LoveLetterSection key="letter" />}
-      {config.finalMessage && <WishSection key="wish" />}
+      {!isLoading && (
+        <>
+          <DebugPanel />
+          <CustomCursor />
+          <AudioPlayer musicUrl={config.musicUrl} />
+
+          {/* All sections stacked vertically */}
+          <IntroSection key="intro" />
+          {config.memories.length > 0 && <GallerySection key="gallery" />}
+          {config.memories.length > 0 && <TimelineSection key="timeline" />}
+          {config.loveReasons.length > 0 && <StarsSection key="stars" />}
+          {config.letterContent && <LoveLetterSection key="letter" />}
+          {config.finalMessage && <WishSection key="wish" />}
+        </>
+      )}
     </main>
   );
 }
+

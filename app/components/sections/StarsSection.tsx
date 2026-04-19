@@ -3,10 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
-import * as THREE from 'three';
-import { createStarField } from '@/lib/three-scene';
 import { config } from '@/config';
 import { SectionWrapper } from '@/components/ui/SectionWrapper';
+import { useEasterEggs } from '@/lib/useEasterEggs';
 
 interface StarCard {
   id: number;
@@ -15,118 +14,56 @@ interface StarCard {
 }
 
 export function StarsSection() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [starCards, setStarCards] = useState<StarCard[]>([]);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const raycasterRef = useRef(new THREE.Raycaster());
-  const mouseRef = useRef(new THREE.Vector2());
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [magicMode, setMagicMode] = useState(false);
 
-  useEffect(() => {
-    if (!canvasRef.current) return;
+  const handleClick = (e: React.MouseEvent) => {
+    if (config.loveReasons.length === 0) return;
 
-    // Three.js setup
-    const scene = new THREE.Scene();
-    sceneRef.current = scene;
-
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    camera.position.z = 150;
-
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvasRef.current,
-      alpha: true,
-      antialias: true
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-    // Create larger star field
-    const stars = createStarField(1000);
-    scene.add(stars);
-
-    let mouseX = 0;
-    let mouseY = 0;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+    const randomReason = config.loveReasons[Math.floor(Math.random() * config.loveReasons.length)];
+    const newCard: StarCard = {
+      id: Date.now(),
+      reason: randomReason,
+      position: { x: e.clientX, y: e.clientY }
     };
+    setStarCards([...starCards, newCard]);
 
-    const handleClick = (e: MouseEvent) => {
-      if (config.loveReasons.length === 0) return;
+    setTimeout(() => {
+      setStarCards((prev) => prev.filter((card) => card.id !== newCard.id));
+    }, 4000);
+  };
 
-      mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseRef.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-      raycasterRef.current.setFromCamera(mouseRef.current, camera);
-      const intersects = raycasterRef.current.intersectObject(stars);
-
-      if (intersects.length > 0 && config.loveReasons.length > 0) {
-        const randomReason = config.loveReasons[Math.floor(Math.random() * config.loveReasons.length)];
-        const newCard: StarCard = {
-          id: Date.now(),
-          reason: randomReason,
-          position: { x: e.clientX, y: e.clientY }
-        };
-        setStarCards([...starCards, newCard]);
-
-        setTimeout(() => {
-          setStarCards((prev) => prev.filter((card) => card.id !== newCard.id));
-        }, 4000);
+  // Easter egg: Press "magic" to reveal all reasons at once
+  useEasterEggs([
+    {
+      keys: ['m', 'a', 'g', 'i', 'c'],
+      action: () => {
+        setMagicMode(!magicMode);
+        if (containerRef.current) {
+          gsap.to(containerRef.current, {
+            duration: 0.5,
+            filter: magicMode ? 'brightness(1)' : 'brightness(1.3)',
+            repeat: 1,
+            yoyo: true
+          });
+        }
       }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('click', handleClick);
-
-    const animate = () => {
-      requestAnimationFrame(animate);
-
-      // Rotate and parallax
-      stars.rotation.x += 0.00003;
-      stars.rotation.y += 0.0001;
-
-      // Subtle cursor tracking
-      const rotX = mouseY * 0.05;
-      const rotY = mouseX * 0.05;
-      stars.rotation.z += (rotX - stars.rotation.z) * 0.05;
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    // Handle resize
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('click', handleClick);
-      window.removeEventListener('resize', handleResize);
-      renderer.dispose();
-    };
-  }, []);
+    }
+  ]);
 
   return (
     <SectionWrapper>
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0"
-        style={{ background: 'radial-gradient(ellipse at center, #2a2a3e 0%, #0a0008 100%)' }}
+      <div 
+        ref={containerRef}
+        className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e] to-[#0a0008] z-0"
       />
 
       <motion.div
-        className="absolute top-12 left-12 text-5xl font-bold"
+        className="absolute top-12 left-12 text-5xl font-bold z-10 pointer-events-none"
+        initial={{ opacity: 0, x: -50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, type: 'spring' }}
         style={{
           background: 'linear-gradient(120deg, #ff6b9d, #ffd700)',
           backgroundClip: 'text',
@@ -137,6 +74,8 @@ export function StarsSection() {
         Why I Love You
       </motion.div>
 
+      <div className="absolute inset-0 z-5" onClick={handleClick} />
+
       <AnimatePresence>
         {starCards.map((card) => (
           <motion.div
@@ -146,12 +85,14 @@ export function StarsSection() {
               left: card.position.x,
               top: card.position.y
             }}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-            transition={{ type: 'spring', stiffness: 200 }}
+            initial={{ opacity: 0, scale: 0, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0, y: -20 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
             drag
             dragElastic={0.2}
+            whileHover={{ scale: 1.05 }}
+            whileDrag={{ scale: 1.1, rotateZ: 5 }}
           >
             <p className="text-[#ffb3d9] text-center font-serif italic">{card.reason}</p>
           </motion.div>
@@ -159,9 +100,28 @@ export function StarsSection() {
       </AnimatePresence>
 
       {config.loveReasons.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+        <div className="absolute inset-0 flex items-center justify-center text-gray-400 z-10">
           <p>Add love reasons to see them here!</p>
         </div>
+      )}
+
+      {/* Interaction hint */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 text-center"
+        animate={{ opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 3, repeat: Infinity }}
+      >
+        <p className="text-gray-400 text-sm">Click anywhere to reveal why I love you... (or type "magic")</p>
+      </motion.div>
+
+      {config.loveReasons.length > 0 && (
+        <motion.p 
+          className="absolute bottom-12 left-1/2 transform -translate-x-1/2 text-gray-400 text-sm z-10"
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          Click anywhere to reveal reasons why I love you ✨
+        </motion.p>
       )}
     </SectionWrapper>
   );

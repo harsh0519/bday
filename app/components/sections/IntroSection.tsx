@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
 import * as THREE from 'three';
-import { config } from '@/config';
+import { useEasterEggs, useDoubleTap } from '@/lib/useEasterEggs';
 
 export function IntroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,6 +13,34 @@ export function IntroSection() {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const nameRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const [easterEggTriggered, setEasterEggTriggered] = useState(false);
+  const [heartPositions] = useState<{ x: number; y: number }[]>(
+    [...Array(5)].map(() => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerWidth
+    }))
+  );
+
+  // Easter eggs
+  useEasterEggs([
+    {
+      keys: ['l', 'o', 'v', 'e'],
+      action: () => {
+        setEasterEggTriggered(true);
+        setTimeout(() => setEasterEggTriggered(false), 2000);
+        // Create heart burst
+        const hearts = containerRef.current?.querySelectorAll('[data-heart]');
+        hearts?.forEach((heart) => {
+          gsap.to(heart, {
+            scale: 1.5,
+            duration: 0.3,
+            yoyo: true,
+            repeat: 1
+          });
+        });
+      }
+    }
+  ]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -267,7 +295,7 @@ export function IntroSection() {
   return (
     <div
       ref={containerRef}
-      className="w-full min-h-screen overflow-hidden flex flex-col items-center justify-center relative"
+      className="w-screen min-h-screen overflow-hidden flex flex-col items-center justify-center relative bg-[#0a0008]"
     >
       {/* Galaxy Canvas Background */}
       <canvas
@@ -319,10 +347,48 @@ export function IntroSection() {
             window.scrollTo?.({ top: window.innerHeight, behavior: 'smooth' });
           }}
           type="button"
+          onDoubleClick={() => {
+            // Easter egg: shake effect
+            gsap.to((e: any) => e, {
+              duration: 0.5,
+              repeat: 3,
+              yoyo: true,
+              rotation: 5
+            });
+          }}
         >
           Enter ✨
         </motion.button>
       </div>
+
+      {/* Cute floating hearts overlay */}
+      {[...Array(5)].map((_, i) => (
+        <motion.div
+          key={`heart-${i}`}
+          className="absolute text-4xl pointer-events-none"
+          data-heart
+          initial={{
+            x: Math.random() * window.innerWidth,
+            y: window.innerHeight + 50,
+            opacity: 0
+          }}
+          animate={{
+            y: -100,
+            opacity: [0, 1, 1, 0],
+            x: Math.random() * window.innerWidth
+          }}
+          transition={{
+            duration: 4 + i,
+            ease: 'easeInOut',
+            repeat: Infinity,
+            repeatType: 'loop',
+            delay: i * 0.8
+          }}
+          whileHover={{ scale: 1.2 }}
+        >
+          💕
+        </motion.div>
+      ))}
     </div>
   );
 }
