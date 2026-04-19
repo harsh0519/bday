@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Lenis from '@studio-freight/lenis';
-import { gsap, ScrollTrigger } from '@/lib/gsap';
+import { ScrollTrigger } from '@/lib/gsap';
 import { CustomCursor, AudioPlayer, PageLoader } from '@/components/ui';
 import { DebugPanel } from '@/components/ui/DebugPanel';
 import {
@@ -27,9 +27,8 @@ export default function Home() {
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      smoothTouch: false
-    } as any);
+      smoothWheel: true
+    });
 
     lenisRef.current = lenis;
     console.log('✅ Lenis initialized:', lenis);

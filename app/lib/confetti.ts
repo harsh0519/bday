@@ -19,7 +19,7 @@ export function createConfetti(container: HTMLElement) {
 
     const angle = (Math.PI * 2 * i) / confettiPieces;
     const velocity = 5 + Math.random() * 5;
-    let vx = Math.cos(angle) * velocity;
+    const vx = Math.cos(angle) * velocity;
     let vy = Math.sin(angle) * velocity - 3;
     const gravity = 0.1;
 

@@ -11,25 +11,25 @@ import { useEasterEggs } from '@/lib/useEasterEggs';
 
 export function LoveLetterSection() {
   const [isOpen, setIsOpen] = useState(false);
-  const [sound, setSound] = useState<Howl | null>(null);
   const letterRef = useRef<HTMLDivElement>(null);
   const flapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const soundRef = useRef<Howl | null>(null);
 
   useEffect(() => {
-    if (config.musicUrl && config.musicUrl !== '[MUSIC URL]') {
-      const newSound = new Howl({
+    if (config.musicUrl && !soundRef.current) {
+      soundRef.current = new Howl({
         src: [config.musicUrl],
         loop: true,
         volume: 0.3
       });
-      setSound(newSound);
 
       return () => {
-        newSound.unload();
+        soundRef.current?.unload();
+        soundRef.current = null;
       };
     }
   }, []);
@@ -40,8 +40,8 @@ export function LoveLetterSection() {
       keys: ['o', 'p', 'e', 'n'],
       action: () => {
         setIsOpen(true);
-        if (sound && !sound.playing()) {
-          sound.play();
+        if (soundRef.current && !soundRef.current.playing()) {
+          soundRef.current.play();
         }
         // Burst effect
         if (containerRef.current) {
@@ -173,8 +173,8 @@ export function LoveLetterSection() {
 
   const handleOpen = () => {
     setIsOpen(true);
-    if (sound && !sound.playing()) {
-      sound.play();
+    if (soundRef.current && !soundRef.current.playing()) {
+      soundRef.current.play();
     }
   };
 

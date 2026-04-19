@@ -11,36 +11,36 @@ interface AudioPlayerProps {
 
 export function AudioPlayer({ musicUrl }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState<Howl | null>(null);
+  const soundRef = useRef<Howl | null>(null);
   const vinylRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<gsap.core.Tween | null>(null);
 
   useEffect(() => {
-    if (musicUrl && musicUrl !== '[MUSIC URL]') {
-      const newSound = new Howl({
+    if (musicUrl && !soundRef.current) {
+      soundRef.current = new Howl({
         src: [musicUrl],
         loop: true,
         volume: 0.5
       });
-      setSound(newSound);
 
       return () => {
-        newSound.unload();
+        soundRef.current?.unload();
+        soundRef.current = null;
       };
     }
   }, [musicUrl]);
 
   const togglePlay = () => {
-    if (!sound) return;
+    if (!soundRef.current) return;
 
-    if (sound.playing()) {
-      sound.pause();
+    if (soundRef.current.playing()) {
+      soundRef.current.pause();
       setIsPlaying(false);
       if (animationRef.current) {
         animationRef.current.pause();
       }
     } else {
-      sound.play();
+      soundRef.current.play();
       setIsPlaying(true);
       startVinylAnimation();
     }
@@ -73,7 +73,7 @@ export function AudioPlayer({ musicUrl }: AudioPlayerProps) {
         className="relative w-16 h-16 flex items-center justify-center"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        disabled={!sound}
+        disabled={!soundRef.current}
       >
         {/* Vinyl Record */}
         <motion.div

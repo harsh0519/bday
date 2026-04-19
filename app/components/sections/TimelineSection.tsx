@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { gsap } from '@/lib/gsap';
+import { motion } from 'framer-motion';
 import { config } from '@/config';
 import { SectionWrapper } from '@/components/ui/SectionWrapper';
 import * as THREE from 'three';

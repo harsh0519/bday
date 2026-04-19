@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 
+interface PointsWithAnimation extends THREE.Points {
+  velocities?: Float32Array;
+  lifetimes?: Float32Array;
+}
+
 export function createStarField(count: number = 1000) {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(count * 3);
@@ -85,20 +90,20 @@ export function createParticles(particleCount: number = 500) {
     sizeAttenuation: true
   });
 
-  const points = new THREE.Points(geometry, material);
-  (points as any).velocities = velocities;
-  (points as any).lifetimes = lifetimes;
+  const points = new THREE.Points(geometry, material) as PointsWithAnimation;
+  points.velocities = velocities;
+  points.lifetimes = lifetimes;
 
   return points;
 }
 
 export function animateParticles(
-  points: THREE.Points,
+  points: PointsWithAnimation,
   deltaTime: number,
   gravity: number = 0.98
 ) {
-  const velocities = (points as any).velocities as Float32Array;
-  const lifetimes = (points as any).lifetimes as Float32Array;
+  const velocities = points.velocities as Float32Array;
+  const lifetimes = points.lifetimes as Float32Array;
   const positions = points.geometry.attributes.position.array as Float32Array;
   const count = positions.length / 3;
 

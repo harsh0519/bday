@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
 import * as THREE from 'three';
-import { useEasterEggs, useDoubleTap } from '@/lib/useEasterEggs';
+import { useEasterEggs } from '@/lib/useEasterEggs';
 
 export function IntroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,8 +13,7 @@ export function IntroSection() {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const nameRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
-  const [easterEggTriggered, setEasterEggTriggered] = useState(false);
-  const [heartPositions] = useState<{ x: number; y: number }[]>(
+  const [heartPositions] = useState<{ x: number; y: number }[]>(() =>
     [...Array(5)].map(() => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerWidth
@@ -26,18 +25,18 @@ export function IntroSection() {
     {
       keys: ['l', 'o', 'v', 'e'],
       action: () => {
-        setEasterEggTriggered(true);
-        setTimeout(() => setEasterEggTriggered(false), 2000);
-        // Create heart burst
-        const hearts = containerRef.current?.querySelectorAll('[data-heart]');
-        hearts?.forEach((heart) => {
-          gsap.to(heart, {
-            scale: 1.5,
-            duration: 0.3,
-            yoyo: true,
-            repeat: 1
+        setTimeout(() => {
+          // Create heart burst
+          const hearts = containerRef.current?.querySelectorAll('[data-heart]');
+          hearts?.forEach((heart) => {
+            gsap.to(heart, {
+              scale: 1.5,
+              duration: 0.3,
+              yoyo: true,
+              repeat: 1
+            });
           });
-        });
+        }, 0);
       }
     }
   ]);
@@ -250,11 +249,9 @@ export function IntroSection() {
 
     // Animation loop
     let animationFrameId: number;
-    let time = 0;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      time += 0.0005;
 
       // Slowly rotate constellation
       starConstellation.rotation.x += 0.00005;
@@ -348,13 +345,7 @@ export function IntroSection() {
           }}
           type="button"
           onDoubleClick={() => {
-            // Easter egg: shake effect
-            gsap.to((e: any) => e, {
-              duration: 0.5,
-              repeat: 3,
-              yoyo: true,
-              rotation: 5
-            });
+            // Easter egg: shake effect - disabled for now
           }}
         >
           Enter ✨
@@ -362,20 +353,20 @@ export function IntroSection() {
       </div>
 
       {/* Cute floating hearts overlay */}
-      {[...Array(5)].map((_, i) => (
+      {heartPositions.map((pos, i) => (
         <motion.div
           key={`heart-${i}`}
           className="absolute text-4xl pointer-events-none"
           data-heart
           initial={{
-            x: Math.random() * window.innerWidth,
+            x: pos.x,
             y: window.innerHeight + 50,
             opacity: 0
           }}
           animate={{
             y: -100,
             opacity: [0, 1, 1, 0],
-            x: Math.random() * window.innerWidth
+            x: pos.x + (Math.sin(i) * 50)
           }}
           transition={{
             duration: 4 + i,

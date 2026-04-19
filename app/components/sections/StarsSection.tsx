@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
 import { config } from '@/config';
@@ -111,7 +111,7 @@ export function StarsSection() {
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 3, repeat: Infinity }}
       >
-        <p className="text-gray-400 text-sm">Click anywhere to reveal why I love you... (or type "magic")</p>
+        <p className="text-gray-400 text-sm">Click anywhere to reveal why I love you... (or type &ldquo;magic&rdquo;)</p>
       </motion.div>
 
       {config.loveReasons.length > 0 && (
