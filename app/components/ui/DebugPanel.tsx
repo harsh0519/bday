@@ -11,7 +11,6 @@ export function DebugPanel() {
   const [sectionCount, setSectionCount] = useState(0);
 
   useEffect(() => {
-    console.log('🔧 Debug Panel Mounted');
 
     const updateMetrics = () => {
       const sh = document.documentElement.scrollHeight;
@@ -21,7 +20,6 @@ export function DebugPanel() {
       setViewportHeight(vh);
       setTotalHeight(sh - vh);
       setSectionCount(sections);
-      console.log(`📊 METRICS: ScrollHeight=${sh}px | ViewportHeight=${vh}px | Sections=${sections}`);
     };
 
     // Initial measurement
@@ -31,7 +29,6 @@ export function DebugPanel() {
 
     const handleScroll = () => {
       setScrollY(window.scrollY);
-      console.log(`📜 SCROLL: ${window.scrollY.toFixed(0)}px`);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -41,7 +38,6 @@ export function DebugPanel() {
     // Test click
     const handleClick = () => {
       setClicks(c => c + 1);
-      console.log('🖱️ Click detected');
     };
 
     document.addEventListener('click', handleClick);

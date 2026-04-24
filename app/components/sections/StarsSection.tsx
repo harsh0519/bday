@@ -53,7 +53,7 @@ export function StarsSection() {
   ]);
 
   return (
-    <SectionWrapper>
+    <SectionWrapper theme="dreamy" entrance="right">
       <div 
         ref={containerRef}
         className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e] to-[#0a0008] z-0"

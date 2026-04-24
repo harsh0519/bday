@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 export function PageProgress() {
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState(1);
   const sections = 6;
 
@@ -12,10 +11,8 @@ export function PageProgress() {
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = window.scrollY / totalHeight;
-      setScrollProgress(Math.min(progress, 1));
       const newSection = Math.min(Math.floor(progress * sections) + 1, sections);
       setActiveSection(newSection);
-      console.log('📍 Scroll progress:', progress.toFixed(2), '| Active section:', newSection);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -48,9 +45,7 @@ export function PageProgress() {
               whileHover={{ scale: 1.15, opacity: 1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => {
-                console.log('❤️ Heart', sectionNum, 'clicked! Scrolling to section', sectionNum);
                 const scrollPosition = (sectionNum - 1) * window.innerHeight;
-                console.log('📍 Target scroll position:', scrollPosition);
                 window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
               }}
               style={{

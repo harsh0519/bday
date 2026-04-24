@@ -179,7 +179,7 @@ export function LoveLetterSection() {
   };
 
   return (
-    <SectionWrapper>
+    <SectionWrapper theme="vintage" entrance="up">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 z-0"

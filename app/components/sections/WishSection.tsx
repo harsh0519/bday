@@ -170,7 +170,7 @@ export function WishSection() {
   };
 
   return (
-    <SectionWrapper>
+    <SectionWrapper theme="celebration" entrance="fade">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 z-0"

@@ -21,7 +21,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log('🚀 Initializing page...');
     
     // Initialize Lenis with proper configuration
     const lenis = new Lenis({
@@ -31,11 +30,9 @@ export default function Home() {
     });
 
     lenisRef.current = lenis;
-    console.log('✅ Lenis initialized:', lenis);
 
     // Update ScrollTrigger on every Lenis scroll
     lenis.on('scroll', () => {
-      console.log('📜 Scroll event fired, window.scrollY:', window.scrollY);
       ScrollTrigger.update();
     });
 
@@ -47,18 +44,15 @@ export default function Home() {
     };
 
     rafId = requestAnimationFrame(animate);
-    console.log('🎬 RAF loop started');
 
     // Refresh ScrollTrigger after a minimal delay to ensure DOM is ready
     const refreshTimout = setTimeout(() => {
-      console.log('🔄 ScrollTrigger refresh called');
       ScrollTrigger.refresh();
       // Hide loader after 2.5 seconds
       setIsLoading(false);
     }, 2500);
 
     const handleResize = () => {
-      console.log('📐 Window resized, refreshing ScrollTrigger');
       ScrollTrigger.refresh();
     };
 
@@ -80,15 +74,15 @@ export default function Home() {
 
       {!isLoading && (
         <>
-          <DebugPanel />
+          {process.env.NODE_ENV === 'development' && <DebugPanel />}
           <CustomCursor />
           <AudioPlayer musicUrl={config.musicUrl} />
 
           {/* All sections stacked vertically */}
           <IntroSection key="intro" />
           {config.memories.length > 0 && <GallerySection key="gallery" />}
-          {config.memories.length > 0 && <TimelineSection key="timeline" />}
-          {config.loveReasons.length > 0 && <StarsSection key="stars" />}
+          <TimelineSection key="timeline" />
+          <StarsSection key="stars" />
           {config.letterContent && <LoveLetterSection key="letter" />}
           {config.finalMessage && <WishSection key="wish" />}
         </>

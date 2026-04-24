@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import type { TouchEvent } from 'react';
 
 interface EasterEgg {
   keys: string[];
@@ -9,22 +10,24 @@ export function useEasterEggs(easterEggs: EasterEgg[]) {
   const keysPressed = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      keysPressed.current.add(e.key.toLowerCase());
+    const handleKeyDown = (event: KeyboardEvent) => {
+      keysPressed.current.add(event.key.toLowerCase());
 
-      // Check each easter egg
-      easterEggs.forEach((egg) => {
-        if (
-          egg.keys.every((key) => keysPressed.current.has(key.toLowerCase()))
-        ) {
+      for (const egg of easterEggs) {
+        const unlocked = egg.keys.every((key) =>
+          keysPressed.current.has(key.toLowerCase())
+        );
+
+        if (unlocked) {
           egg.action();
           keysPressed.current.clear();
+          break;
         }
-      });
+      }
     };
 
-    const handleKeyUp = (e: KeyboardEvent) => {
-      keysPressed.current.delete(e.key.toLowerCase());
+    const handleKeyUp = (event: KeyboardEvent) => {
+      keysPressed.current.delete(event.key.toLowerCase());
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -37,42 +40,41 @@ export function useEasterEggs(easterEggs: EasterEgg[]) {
   }, [easterEggs]);
 }
 
-// Double tap detection for touch devices
-export function useDoubleTap(callback: () => void, delay: number = 300) {
-  const lastTap = useRef<number>(0);
+export function useDoubleTap(callback: () => void, delay = 300) {
+  const lastTap = useRef(0);
 
-  return (e: React.TouchEvent) => {
+  return () => {
     const now = Date.now();
     if (now - lastTap.current < delay) {
       callback();
       lastTap.current = 0;
-    } else {
-      lastTap.current = now;
+      return;
     }
+
+    lastTap.current = now;
   };
 }
 
-// Swipe detection
 export function useSwipe(
   onSwipeLeft?: () => void,
   onSwipeRight?: () => void,
-  threshold: number = 50
+  threshold = 50
 ) {
-  const touchStartX = useRef<number>(0);
-  const touchStartY = useRef<number>(0);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
 
   return {
-    onTouchStart: (e: React.TouchEvent) => {
-      touchStartX.current = e.touches[0].clientX;
-      touchStartY.current = e.touches[0].clientY;
+    onTouchStart: (event: TouchEvent) => {
+      touchStartX.current = event.touches[0].clientX;
+      touchStartY.current = event.touches[0].clientY;
     },
-    onTouchEnd: (e: React.TouchEvent) => {
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
+    onTouchEnd: (event: TouchEvent) => {
+      const touchEndX = event.changedTouches[0].clientX;
+      const touchEndY = event.changedTouches[0].clientY;
+
       const diffX = touchStartX.current - touchEndX;
       const diffY = Math.abs(touchStartY.current - touchEndY);
 
-      // Only trigger if vertical movement is minimal (horizontal swipe)
       if (diffY < threshold) {
         if (diffX > threshold && onSwipeLeft) {
           onSwipeLeft();
