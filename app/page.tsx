@@ -58,8 +58,32 @@ export default function Home() {
 
     window.addEventListener('resize', handleResize);
 
+    const handleSparkle = (event: MouseEvent) => {
+      const sparkleCount = 18;
+      for (let i = 0; i < sparkleCount; i++) {
+        const sparkle = document.createElement('span');
+        sparkle.className = 'sparkle-burst';
+        const angle = (Math.PI * 2 * i) / sparkleCount;
+        const radius = 42 + Math.random() * 26;
+        const offsetX = Math.cos(angle) * radius;
+        const offsetY = Math.sin(angle) * radius;
+        sparkle.style.left = `${event.clientX}px`;
+        sparkle.style.top = `${event.clientY}px`;
+        sparkle.style.setProperty('--sparkle-x', `${event.clientX + offsetX}px`);
+        sparkle.style.setProperty('--sparkle-y', `${event.clientY + offsetY}px`);
+        document.body.appendChild(sparkle);
+
+        window.setTimeout(() => {
+          sparkle.remove();
+        }, 1100);
+      }
+    };
+
+    window.addEventListener('click', handleSparkle);
+
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('click', handleSparkle);
       cancelAnimationFrame(rafId);
       clearTimeout(refreshTimout);
       lenis.destroy();

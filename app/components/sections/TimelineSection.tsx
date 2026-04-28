@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { SectionWrapper } from '@/components/ui/SectionWrapper';
-import * as THREE from 'three';
+import { StarfieldBackdrop } from '@/components/ui/StarfieldBackdrop';
 
 // Demo images with gradient demonstrations
 const DEMO_IMAGES = [
@@ -134,24 +134,48 @@ function PolaroidImage({
 
 export function TimelineSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
 
-  // Initialize positions for all cards
-  const [positions, setPositions] = useState<PolaroidPosition[]>(() => {
-    return DEMO_IMAGES.map((_, index) => {
-      const row = Math.floor(index / 5);
-      const col = index % 5;
-      const randomX = Math.random() * 40 - 20;
-      const randomY = Math.random() * 30 - 15;
+  const getLayout = () => {
+    if (typeof window === 'undefined') {
+      return {
+        positions: DEMO_IMAGES.map(() => ({ x: 0, y: 0 })),
+        gridHeight: null
+      };
+    }
+
+    const width = Math.max(320, window.innerWidth);
+    const height = Math.max(640, window.innerHeight);
+    const paddingX = width < 900 ? 28 : 48;
+    const paddingY = width < 900 ? 120 : 140;
+    const usableWidth = Math.max(320, width - paddingX * 2);
+    const usableHeight = Math.max(520, height - paddingY * 2);
+    const columns = width < 900 ? 3 : 5;
+    const rows = Math.ceil(DEMO_IMAGES.length / columns);
+    const cellWidth = usableWidth / columns;
+    const cellHeight = Math.max(260, usableHeight / Math.max(rows, 2));
+    const nextGridHeight = Math.max(height - 220, paddingY * 2 + rows * cellHeight + 60);
+
+    const nextPositions = DEMO_IMAGES.map((_, index) => {
+      const row = Math.floor(index / columns);
+      const col = index % columns;
+      const randomX = Math.random() * 28 - 14;
+      const randomY = Math.random() * 24 - 12;
 
       return {
-        x: col * 280 + randomX,
-        y: row * 300 + randomY
+        x: paddingX + col * cellWidth + cellWidth / 2 - 128 + randomX,
+        y: paddingY + row * cellHeight + cellHeight / 2 - 160 + randomY
       };
     });
-  });
+
+    return {
+      positions: nextPositions,
+      gridHeight: nextGridHeight
+    };
+  };
+
+  const initialLayout = getLayout();
+  const [positions, setPositions] = useState<PolaroidPosition[]>(initialLayout.positions);
+  const [gridHeight, setGridHeight] = useState<number | null>(initialLayout.gridHeight);
 
   const cardContent = DEMO_IMAGES.map((_, index) => {
     const titles = [
@@ -221,142 +245,23 @@ export function TimelineSection() {
     });
   };
 
-  // Setup Three.js scene
   useEffect(() => {
-    if (!canvasRef.current) return;
-
-    const scene = new THREE.Scene();
-    sceneRef.current = scene;
-
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      5000
-    );
-    camera.position.z = 200;
-
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvasRef.current,
-      alpha: false,
-      antialias: true
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x0a0008);
-    rendererRef.current = renderer;
-
-    // Create a galaxy-like band where density falls off from the center line
-    const createParticleField = () => {
-      const geometry = new THREE.BufferGeometry();
-      const particleCount = 700;
-
-      const positions = new Float32Array(particleCount * 3);
-      const colors = new Float32Array(particleCount * 3);
-      const sizes = new Float32Array(particleCount);
-
-      for (let i = 0; i < particleCount; i++) {
-        // Radius uses squared random for higher density near the galaxy core
-        const radius = Math.pow(Math.random(), 1.8) * 340;
-        const angle = Math.random() * Math.PI * 2;
-        const armOffset = (Math.random() - 0.5) * 0.5;
-
-        // Dense center band: y is concentrated around 0 and falls off outward
-        const normalized = radius / 340;
-        const bandSpread = 10 + normalized * 90;
-        const y = (Math.random() - 0.5) * bandSpread;
-
-        positions[i * 3] = Math.cos(angle + armOffset + radius * 0.02) * radius;
-        positions[i * 3 + 1] = y;
-        positions[i * 3 + 2] = Math.sin(angle + armOffset + radius * 0.02) * radius * 0.7;
-
-        // Brighter stars near the dense center line
-        const centerBoost = Math.max(0.2, 1 - Math.min(1, Math.abs(y) / 120));
-
-        if (Math.random() > 0.45) {
-          colors[i * 3] = 1;
-          colors[i * 3 + 1] = 0.42 + 0.15 * centerBoost;
-          colors[i * 3 + 2] = 0.61 + 0.1 * centerBoost;
-        } else {
-          colors[i * 3] = 1;
-          colors[i * 3 + 1] = 0.84;
-          colors[i * 3 + 2] = 0.1 * centerBoost;
-        }
-
-        sizes[i] = Math.random() * 2.2 + 0.6 + centerBoost * 0.6;
-      }
-
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-
-      const material = new THREE.PointsMaterial({
-        size: 2.2,
-        vertexColors: true,
-        sizeAttenuation: true,
-        transparent: true,
-        opacity: 0.88,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      });
-
-      return new THREE.Points(geometry, material);
-    };
-
-    const particles = createParticleField();
-    scene.add(particles);
-
-    // Add lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
-
-    const pointLight = new THREE.PointLight(0xff6b9d, 0.8);
-    pointLight.position.set(200, 200, 200);
-    scene.add(pointLight);
-
-    // Handle window resize
     const handleResize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
+      const nextLayout = getLayout();
+      setPositions(nextLayout.positions);
+      setGridHeight(nextLayout.gridHeight);
     };
-
     window.addEventListener('resize', handleResize);
-
-    // Animation loop
-    let animationFrameId: number;
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-
-      if (particles) {
-        particles.rotation.x += 0.00005;
-        particles.rotation.y += 0.0001;
-        particles.rotation.z += 0.00003;
-      }
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
-      particles.geometry.dispose();
-      (particles.material as THREE.Material).dispose();
-      renderer.dispose();
-    };
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
-    <SectionWrapper theme="golden" entrance="up" className="relative w-full min-h-screen overflow-hidden py-16 md:py-24">
-      {/* Three.js Canvas Background */}
-      <canvas
-        ref={canvasRef}
-        className="absolute top-0 left-0 w-full h-full z-0"
-      />
+    <SectionWrapper
+      theme="golden"
+      entrance="up"
+      className="relative w-full min-h-screen overflow-hidden py-16 md:py-24"
+      background={<StarfieldBackdrop className="absolute inset-0" />}
+    >
 
       {/* Polaroid Gallery Content */}
       <div className="relative z-10 w-full h-full px-4 md:px-8">
@@ -379,15 +284,19 @@ export function TimelineSection() {
         {/* Polaroid Grid Container - Draggable Pinned Layout */}
         <div
           ref={containerRef}
-          className="relative w-full max-w-6xl mx-auto h-auto"
+          className="relative w-full max-w-6xl mx-auto"
           style={{
             perspective: '1000px'
           }}
         >
           {/* Grid with absolute positioning for organic pinned effect */}
-          <div className="relative w-full" style={{ height: '900px', position: 'relative' }}>
+          <div
+            className="relative w-full"
+            style={{ minHeight: gridHeight ? `${gridHeight}px` : 'calc(100vh - 220px)', position: 'relative' }}
+          >
             {DEMO_IMAGES.map((image, index) => {
               const card = cardContent[index];
+              const position = positions[index] ?? { x: 0, y: 0 };
 
               return (
                 <PolaroidImage
@@ -396,7 +305,7 @@ export function TimelineSection() {
                   emoji={image.emoji}
                   gradient={image.gradient}
                   rotation={card.rotation}
-                  position={positions[index]}
+                  position={position}
                   onDragEnd={handleDragEnd}
                   date={card.date}
                   title={card.title}
@@ -405,12 +314,7 @@ export function TimelineSection() {
             })}
           </div>
 
-          {/* Extra height for all polaroids */}
-          <div style={{ height: '200px' }} />
         </div>
-
-        {/* Bottom spacing */}
-        <div className="h-24" />
       </div>
     </SectionWrapper>
   );

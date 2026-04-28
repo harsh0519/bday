@@ -6,16 +6,13 @@ import { gsap } from '@/lib/gsap';
 import { config } from '@/config';
 import { SectionWrapper } from '@/components/ui/SectionWrapper';
 import { Howl } from 'howler';
-import * as THREE from 'three';
 import { useEasterEggs } from '@/lib/useEasterEggs';
+import { StarfieldBackdrop } from '@/components/ui/StarfieldBackdrop';
 
 export function LoveLetterSection() {
   const [isOpen, setIsOpen] = useState(false);
   const letterRef = useRef<HTMLDivElement>(null);
   const flapRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const soundRef = useRef<Howl | null>(null);
 
@@ -56,121 +53,6 @@ export function LoveLetterSection() {
     }
   ]);
 
-  // Setup Three.js scene
-  useEffect(() => {
-    if (!canvasRef.current) return;
-
-    const scene = new THREE.Scene();
-    sceneRef.current = scene;
-
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      5000
-    );
-    camera.position.z = 200;
-
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvasRef.current,
-      alpha: false,
-      antialias: true
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x0a0008);
-    rendererRef.current = renderer;
-
-    // Create cute floating particles
-    const createParticleField = () => {
-      const geometry = new THREE.BufferGeometry();
-      const particleCount = 500;
-
-      const positions = new Float32Array(particleCount * 3);
-      const colors = new Float32Array(particleCount * 3);
-      const sizes = new Float32Array(particleCount);
-
-      for (let i = 0; i < particleCount; i++) {
-        positions[i * 3] = (Math.random() - 0.5) * 600;
-        positions[i * 3 + 1] = (Math.random() - 0.5) * 600;
-        positions[i * 3 + 2] = Math.random() * 400 - 200;
-
-        // Pink and light pink
-        if (Math.random() > 0.5) {
-          colors[i * 3] = 1;
-          colors[i * 3 + 1] = 0.42;
-          colors[i * 3 + 2] = 0.61;
-        } else {
-          colors[i * 3] = 1;
-          colors[i * 3 + 1] = 0.7;
-          colors[i * 3 + 2] = 0.85;
-        }
-
-        sizes[i] = Math.random() * 3 + 1;
-      }
-
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-
-      const material = new THREE.PointsMaterial({
-        size: 2,
-        vertexColors: true,
-        sizeAttenuation: true,
-        transparent: true,
-        opacity: 0.8
-      });
-
-      return new THREE.Points(geometry, material);
-    };
-
-    const particles = createParticleField();
-    scene.add(particles);
-
-    // Add lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
-
-    const pointLight = new THREE.PointLight(0xff6b9d, 0.8);
-    pointLight.position.set(200, 200, 200);
-    scene.add(pointLight);
-
-    // Handle window resize
-    const handleResize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    // Animation loop
-    let animationFrameId: number;
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-
-      if (particles) {
-        particles.rotation.x += 0.00005;
-        particles.rotation.y += 0.0001;
-        particles.rotation.z += 0.00003;
-      }
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
-      particles.geometry.dispose();
-      (particles.material as THREE.Material).dispose();
-      renderer.dispose();
-    };
-  }, []);
-
   const handleOpen = () => {
     setIsOpen(true);
     if (soundRef.current && !soundRef.current.playing()) {
@@ -179,14 +61,14 @@ export function LoveLetterSection() {
   };
 
   return (
-    <SectionWrapper theme="vintage" entrance="up">
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 z-0"
-      />
+    <SectionWrapper
+      theme="vintage"
+      entrance="up"
+      background={<StarfieldBackdrop className="absolute inset-0" />}
+    >
       <div 
         ref={containerRef}
-        className="h-screen w-screen flex items-center justify-center relative z-10"
+        className="min-h-screen w-full flex items-center justify-center relative z-10"
       >
         <motion.div
           className="absolute top-12 left-12 text-5xl font-bold"

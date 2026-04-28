@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { gsap } from '@/lib/gsap';
+import { StarfieldBackdrop } from '@/components/ui/StarfieldBackdrop';
+import { motion } from 'framer-motion';
 
 const DEMO_IMAGES = [
   {
@@ -46,6 +48,24 @@ const DEMO_IMAGES = [
 export function GallerySection() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const rippleIdRef = useRef(0);
+  const [ripples, setRipples] = useState<{ id: number; panel: number; x: number; y: number }[]>([]);
+
+  const handlePanelClick = (panelIndex: number, event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    rippleIdRef.current += 1;
+    const ripple = {
+      id: rippleIdRef.current,
+      panel: panelIndex,
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+
+    setRipples((prev) => [...prev, ripple]);
+    setTimeout(() => {
+      setRipples((prev) => prev.filter((item) => item.id !== ripple.id));
+    }, 800);
+  };
 
   useEffect(() => {
     if (!sectionRef.current || !trackRef.current) return;
@@ -108,25 +128,49 @@ export function GallerySection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="panel-gallery relative z-10 w-full bg-[#0a0008]">
-      <div className="gallery-container relative flex h-screen w-full overflow-hidden">
-        <div className="pointer-events-none absolute left-1/2 top-0 z-40 h-screen w-[3px] -translate-x-1/2 bg-black/70" />
-
+    <section ref={sectionRef} className="panel-gallery relative z-10 w-full min-h-screen bg-[#0a0008]">
+      <StarfieldBackdrop className="absolute inset-0 z-0" />
+      <div className="gallery-container relative z-10 flex min-h-screen w-full overflow-hidden">
         <div
           ref={trackRef}
-          className="container-inside flex h-screen w-max flex-shrink-0"
+          className="container-inside flex min-h-screen w-max flex-shrink-0"
         >
           {DEMO_IMAGES.map((image, i) => (
             <div
               key={`${image.title}-${i}`}
-              className="gallery-panel relative flex h-screen w-screen flex-shrink-0 items-center justify-center px-4 sm:px-8"
+              className="gallery-panel relative flex min-h-screen w-screen flex-shrink-0 items-center justify-center px-4 sm:px-8"
               style={{
-                background: `linear-gradient(135deg, rgba(255,107,157,${0.08 + (i % 3) * 0.02}) 0%, rgba(10,0,8,0.94) 65%)`
+                background: `linear-gradient(135deg, rgba(10,0,8,0.72) 0%, rgba(10,0,8,0.88) 65%)`
               }}
+              onClick={(event) => handlePanelClick(i, event)}
             >
-              <div className="pointer-events-none absolute left-1/2 top-0 z-30 h-screen w-[3px] -translate-x-1/2 bg-[#4b75ff]/60" />
-
-              <figure className="gallery-figure relative h-[68vh] max-h-[760px] w-[76vw] max-w-[520px] origin-center scale-[0.76] overflow-hidden rounded-2xl border border-white/20 bg-black/40 shadow-[0_35px_120px_rgba(0,0,0,0.55)] sm:h-[76vh] sm:w-[44vw]">
+              {ripples
+                .filter((ripple) => ripple.panel === i)
+                .map((ripple) => (
+                  <span
+                    key={ripple.id}
+                    className="gallery-ripple"
+                    style={{ left: ripple.x, top: ripple.y }}
+                  />
+                ))}
+              <motion.figure
+                className="gallery-figure group relative h-[68vh] max-h-[760px] w-[76vw] max-w-[520px] origin-center scale-[0.76] overflow-hidden rounded-2xl border border-white/20 bg-black/40 shadow-[0_35px_120px_rgba(0,0,0,0.55)] sm:h-[76vh] sm:w-[44vw]"
+                animate={{
+                  rotate: [0, i % 2 === 0 ? 1.6 : -1.6, 0],
+                  x: [0, i % 2 === 0 ? 8 : -8, 0],
+                  y: [0, i % 3 === 0 ? -6 : 6, 0]
+                }}
+                transition={{
+                  duration: 2.8 + (i % 3) * 0.5,
+                  repeat: Infinity,
+                  repeatType: 'mirror',
+                  ease: 'easeInOut'
+                }}
+                whileHover={{ scale: 0.8, boxShadow: '0 40px 130px rgba(0,0,0,0.6)' }}
+              >
+                <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <span className="absolute -left-1/2 top-0 h-full w-1/2 bg-gradient-to-r from-white/0 via-white/35 to-white/0 blur-sm animate-[gallery-shine_1.4s_ease-in-out_infinite]" />
+                </span>
                 <Image
                   src={image.src}
                   alt={image.title}
@@ -139,7 +183,7 @@ export function GallerySection() {
                 <figcaption className="absolute bottom-4 left-4 rounded-full bg-black/65 px-4 py-2 text-sm tracking-wide text-white/95 backdrop-blur-sm">
                   {image.title}
                 </figcaption>
-              </figure>
+              </motion.figure>
             </div>
           ))}
         </div>
