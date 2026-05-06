@@ -7,35 +7,41 @@ interface EasterEgg {
 }
 
 export function useEasterEggs(easterEggs: EasterEgg[]) {
-  const keysPressed = useRef<Set<string>>(new Set());
+  const keysPressed = useRef<string[]>([]);
+  const maxKeyLength = useRef(Math.max(...easterEggs.map(e => e.keys.length)));
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      keysPressed.current.add(event.key.toLowerCase());
+      const key = event.key.toLowerCase();
+      keysPressed.current.push(key);
 
+      // Keep only the last N keys where N is the longest egg sequence
+      if (keysPressed.current.length > maxKeyLength.current) {
+        keysPressed.current.shift();
+      }
+
+      // Check each easter egg
       for (const egg of easterEggs) {
-        const unlocked = egg.keys.every((key) =>
-          keysPressed.current.has(key.toLowerCase())
-        );
-
-        if (unlocked) {
-          egg.action();
-          keysPressed.current.clear();
-          break;
+        const eggSequence = egg.keys.map(k => k.toLowerCase());
+        
+        // Check if the last keys match the egg sequence
+        if (keysPressed.current.length >= eggSequence.length) {
+          const lastKeys = keysPressed.current.slice(-eggSequence.length);
+          const matches = lastKeys.every((key, i) => key === eggSequence[i]);
+          
+          if (matches) {
+            egg.action();
+            keysPressed.current = []; // Reset after triggering
+            break;
+          }
         }
       }
     };
 
-    const handleKeyUp = (event: KeyboardEvent) => {
-      keysPressed.current.delete(event.key.toLowerCase());
-    };
-
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
     };
   }, [easterEggs]);
 }

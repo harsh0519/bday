@@ -71,8 +71,8 @@ export function LoveLetterSection() {
         ref={containerRef}
         className="min-h-screen w-full flex items-center justify-center relative z-10"
       >
-        {/* Love Letter GIF */}
-        <motion.div className="absolute -top-20 right-1/3 w-40 h-40 z-5 pointer-events-none" animate={{ y: [0, -20, 0], scale: [1, 1.05, 1] }} transition={{ duration: 5, repeat: Infinity }}>
+        {/* Love Letter GIF - Top center of letter */}
+        <motion.div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 z-5 pointer-events-none" animate={{ y: [0, -20, 0], scale: [1, 1.05, 1] }} transition={{ duration: 5, repeat: Infinity }}>
           <Image src="/gif/lovelettersection.gif" alt="love letter" width={160} height={160} unoptimized />
         </motion.div>
         
@@ -132,13 +132,13 @@ export function LoveLetterSection() {
           {isOpen && (
             <motion.div
               ref={letterRef}
-              className="absolute -bottom-96 left-1/2 -translate-x-1/2 w-96 bg-[#f5e6c8] rounded-lg p-8 shadow-2xl max-h-96 overflow-y-auto"
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
+              className="absolute -bottom-[500px] left-1/2 -translate-x-1/2 w-96 bg-[#f5e6c8] rounded-lg p-8 shadow-2xl max-h-[500px] overflow-y-auto border-2 border-[#ffd700]"
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
               <p className="text-xs text-gray-600 mb-4 font-serif">Today</p>
-              <div className="space-y-4">
+              <div className="space-y-4 text-justify">
                 {config.letterContent
                   .split('\n')
                   .map((line, idx) => (
@@ -149,7 +149,7 @@ export function LoveLetterSection() {
                       whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
                     >
-                      {line}
+                      {line || <br />}
                     </motion.p>
                   ))}
               </div>

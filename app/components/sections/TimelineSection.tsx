@@ -2,21 +2,22 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { SectionWrapper } from '@/components/ui/SectionWrapper';
 import { StarfieldBackdrop } from '@/components/ui/StarfieldBackdrop';
 
-// Demo images with gradient demonstrations
+// Timeline images from public/timeline folder
 const DEMO_IMAGES = [
-  { emoji: '💕', gradient: 'from-pink-400 to-rose-500' },
-  { emoji: '✨', gradient: 'from-yellow-300 to-amber-400' },
-  { emoji: '🌹', gradient: 'from-red-400 to-pink-500' },
-  { emoji: '💫', gradient: 'from-purple-400 to-pink-500' },
-  { emoji: '🎀', gradient: 'from-pink-300 to-purple-400' },
-  { emoji: '💝', gradient: 'from-red-500 to-pink-600' },
-  { emoji: '🌟', gradient: 'from-yellow-400 to-pink-400' },
-  { emoji: '💖', gradient: 'from-pink-500 to-rose-600' },
-  { emoji: '✨', gradient: 'from-blue-300 to-pink-400' },
-  { emoji: '🎁', gradient: 'from-yellow-300 to-pink-400' },
+  { src: '/timeline/WhatsApp Image 2026-05-07 at 03.05.52 (1).jpeg' },
+  { src: '/timeline/WhatsApp Image 2026-05-07 at 03.05.52.jpeg' },
+  { src: '/timeline/WhatsApp Image 2026-05-07 at 03.05.53 (1).jpeg' },
+  { src: '/timeline/WhatsApp Image 2026-05-07 at 03.05.53.jpeg' },
+  { src: '/timeline/WhatsApp Image 2026-05-07 at 03.05.54 (1).jpeg' },
+  { src: '/timeline/WhatsApp Image 2026-05-07 at 03.05.54 (2).jpeg' },
+  { src: '/timeline/WhatsApp Image 2026-05-07 at 03.05.54 (3).jpeg' },
+  { src: '/timeline/WhatsApp Image 2026-05-07 at 03.05.54.jpeg' },
+  { src: '/timeline/WhatsApp Image 2026-05-07 at 03.20.44.jpeg' },
+  { src: '/timeline/WhatsApp Image 2026-05-07 at 03.27.50.jpeg' }
 ];
 
 interface PolaroidPosition {
@@ -26,22 +27,18 @@ interface PolaroidPosition {
 
 interface PolaroidImageProps {
   index: number;
-  emoji: string;
-  gradient: string;
+  src: string;
   rotation: number;
-  date: string;
-  title: string;
+  beautyLine: string;
   position: PolaroidPosition;
   onDragEnd: (index: number, x: number, y: number) => void;
 }
 
 function PolaroidImage({
   index,
-  emoji,
-  gradient,
+  src,
   rotation,
-  date,
-  title,
+  beautyLine,
   position,
   onDragEnd
 }: PolaroidImageProps) {
@@ -77,15 +74,16 @@ function PolaroidImage({
       {/* Polaroid Card */}
       <div className="relative bg-white rounded-sm shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden w-64 h-80">
         {/* Image Area */}
-        <div className={`w-full h-64 bg-gradient-to-br ${gradient} flex items-center justify-center relative overflow-hidden group`}>
-          {/* Emoji Display */}
-          <motion.div
-            className="text-6xl select-none pointer-events-none"
-            whileHover={{ scale: 1.2, rotate: 15 }}
-            transition={{ type: 'spring', stiffness: 200 }}
-          >
-            {emoji}
-          </motion.div>
+        <div className="w-full h-64 bg-gray-200 flex items-center justify-center relative overflow-hidden group">
+          <Image
+            src={src}
+            alt="Timeline memory"
+            fill
+            className="object-cover w-full h-full"
+            sizes="320px"
+            priority={index < 2}
+            unoptimized
+          />
 
           {/* Hover Shine Effect */}
           <motion.div
@@ -105,26 +103,20 @@ function PolaroidImage({
         </div>
 
         {/* Polaroid Bottom Text Area */}
-        <div className="px-4 py-6 space-y-2 bg-white pointer-events-none">
-          {/* Date */}
-          <div className="text-xs text-gray-500 font-mono tracking-widest uppercase">
-            {date}
-          </div>
-
-          {/* Title */}
-          <h3 className="text-sm font-bold text-gray-900 line-clamp-2 leading-tight">
-            {title}
-          </h3>
+        <div className="px-4 py-6 space-y-3 bg-white pointer-events-none">
+          {/* Beautiful Line */}
+          <p className="text-sm text-gray-700 leading-relaxed italic">
+            {beautyLine}
+          </p>
 
           {/* Decorative line */}
           <div className="h-px bg-gradient-to-r from-[#ff6b9d] to-[#ffd700] opacity-30" />
 
-          {/* Handwritten-style note */}
+          {/* Emoji decoration */}
           <p
-            className="text-xs italic text-[#ff6b9d] tracking-wide"
-            style={{ fontFamily: "'Caveat', cursive" }}
+            className="text-lg text-center"
           >
-            ✨ memories ✨
+            💕 👯 💕
           </p>
         </div>
       </div>
@@ -178,27 +170,22 @@ export function TimelineSection() {
   const [gridHeight, setGridHeight] = useState<number | null>(initialLayout.gridHeight);
 
   const cardContent = DEMO_IMAGES.map((_, index) => {
-    const titles = [
-      'Beautiful Moment',
-      'Special Day',
-      'Happy Times',
-      'Sweet Memory',
-      'Precious Moment',
-      'Love & Laughter',
-      'Forever Memory',
-      'Golden Hour',
-      'Endless Love',
-      'Pure Joy'
+    const beautyLines = [
+      "My best friend forever and always.",
+      "You make every day an adventure.",
+      "Thanks for all the laughs and memories.",
+      "You're my ride or die.",
+      "Best friends till the end.",
+      "Together we conquer the world.",
+      "You make life so much fun.",
+      "Friends like you are rare.",
+      "My person, my best friend.",
+      "Forever grateful for you."
     ];
-
-    const day = String(((index * 7) % 28) + 1).padStart(2, '0');
-    const month = String(((index * 5) % 12) + 1).padStart(2, '0');
-    const year = 2024 + (index % 2);
 
     return {
       rotation: ((index * 17) % 12) - 6,
-      date: `${day}.${month}.${year}`,
-      title: titles[index]
+      beautyLine: beautyLines[index % beautyLines.length]
     };
   });
 
@@ -278,7 +265,7 @@ export function TimelineSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          Our Memories 📸
+          My Beautiful Girl
         </motion.h2>
 
         {/* Polaroid Grid Container - Draggable Pinned Layout */}
@@ -302,13 +289,11 @@ export function TimelineSection() {
                 <PolaroidImage
                   key={index}
                   index={index}
-                  emoji={image.emoji}
-                  gradient={image.gradient}
+                  src={image.src}
                   rotation={card.rotation}
                   position={position}
                   onDragEnd={handleDragEnd}
-                  date={card.date}
-                  title={card.title}
+                  beautyLine={card.beautyLine}
                 />
               );
             })}

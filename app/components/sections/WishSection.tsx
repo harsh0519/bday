@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
@@ -10,10 +10,106 @@ import { createConfetti, createBalloons } from '@/lib/confetti';
 import { useEasterEggs } from '@/lib/useEasterEggs';
 import { StarfieldBackdrop } from '@/components/ui/StarfieldBackdrop';
 
+// Custom flame component with realistic animation
+function RealFlame({ isBlown }: { isBlown: boolean }) {
+  const flameRef = useRef<HTMLDivElement>(null);
+  const innerFlameRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isBlown || !flameRef.current) return;
+
+    // Blow animation - flames spread and disappear
+    const ctx = gsap.context(() => {
+      gsap.to(flameRef.current, {
+        duration: 0.4,
+        scaleY: 2.5,
+        scaleX: 3,
+        opacity: 0,
+        x: Math.random() * 60 - 30, // Random horizontal scatter
+        ease: 'power2.in'
+      });
+    });
+
+    return () => ctx.revert();
+  }, [isBlown]);
+
+  return (
+    <motion.div
+      ref={flameRef}
+      className="absolute -top-8 left-1/2 -translate-x-1/2 w-6 h-10 pointer-events-none"
+      style={{
+        willChange: 'transform, opacity'
+      }}
+    >
+      {/* Outer flame - orange/red */}
+      <motion.div
+        className="absolute inset-0 rounded-full blur-sm"
+        style={{
+          background: 'radial-gradient(ellipse at center, #ff8800 0%, #ff4400 50%, #cc0000 100%)',
+        }}
+        animate={!isBlown ? {
+          scaleY: [1, 1.15, 0.95, 1.1, 1],
+          scaleX: [1, 0.95, 1.05, 0.98, 1],
+          y: [0, -3, 2, -1, 0],
+        } : {}}
+        transition={{
+          duration: 0.4,
+          repeat: !isBlown ? Infinity : 0,
+          repeatType: 'loop',
+          ease: 'easeInOut'
+        }}
+      />
+
+      {/* Inner flame - yellow/white hot */}
+      <motion.div
+        ref={innerFlameRef}
+        className="absolute inset-1 rounded-full"
+        style={{
+          background: 'radial-gradient(ellipse at center, #ffff99 0%, #ffff00 30%, #ffaa00 70%, transparent 100%)',
+        }}
+        animate={!isBlown ? {
+          scaleY: [1, 1.2, 0.9, 1.15, 1],
+          scaleX: [1, 0.9, 1.1, 0.95, 1],
+          y: [0, -2, 3, -2, 0],
+          opacity: [0.9, 1, 0.8, 0.95, 0.9]
+        } : {}}
+        transition={{
+          duration: 0.35,
+          repeat: !isBlown ? Infinity : 0,
+          repeatType: 'loop',
+          ease: 'easeInOut',
+          delay: 0.05
+        }}
+      />
+
+      {/* Glow effect */}
+      {!isBlown && (
+        <motion.div
+          className="absolute -inset-4 rounded-full pointer-events-none"
+          style={{
+            boxShadow: '0 0 20px rgba(255, 140, 0, 0.6), 0 0 40px rgba(255, 68, 0, 0.4)',
+          }}
+          animate={{
+            boxShadow: [
+              '0 0 20px rgba(255, 140, 0, 0.6), 0 0 40px rgba(255, 68, 0, 0.4)',
+              '0 0 25px rgba(255, 140, 0, 0.8), 0 0 50px rgba(255, 68, 0, 0.5)',
+              '0 0 20px rgba(255, 140, 0, 0.6), 0 0 40px rgba(255, 68, 0, 0.4)',
+            ]
+          }}
+          transition={{
+            duration: 0.6,
+            repeat: Infinity,
+            repeatType: 'loop'
+          }}
+        />
+      )}
+    </motion.div>
+  );
+}
+
 export function WishSection() {
   const [candlesBlown, setCandlesBlown] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
-  const flamesRef = useRef<(HTMLDivElement | null)[]>([]);
 
   // Easter egg: Press "blow" to trigger candles
   useEasterEggs([
@@ -31,17 +127,6 @@ export function WishSection() {
 
   const handleBlow = async () => {
     setCandlesBlown(true);
-
-    // Blow out candles
-    flamesRef.current.forEach((flame, i) => {
-      if (flame) {
-        gsap.to(flame, {
-          opacity: 0,
-          duration: 0.2,
-          delay: i * 0.05
-        });
-      }
-    });
 
     // Wait then explode confetti/balloons
     setTimeout(() => {
@@ -62,15 +147,12 @@ export function WishSection() {
         ref={pageRef}
         className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden z-10"
       >
-        {/* Floating wish GIFs */}
-        <motion.div className="absolute top-20 left-12 w-32 h-32 z-5 pointer-events-none" animate={{ y: [0, -20, 0] }} transition={{ duration: 5, repeat: Infinity }}>
-          <Image src="/gif/wish1.gif" alt="wish1" width={128} height={128} unoptimized />
+        {/* Floating wish GIFs - Around the cake */}
+        <motion.div className="absolute top-1/2 -translate-y-1/2 left-16 w-28 h-28 z-5 pointer-events-none" animate={{ y: [0, -15, 0] }} transition={{ duration: 5, repeat: Infinity }}>
+          <Image src="/gif/wish1.gif" alt="wish1" width={110} height={110} unoptimized />
         </motion.div>
-        <motion.div className="absolute bottom-20 right-16 w-28 h-28 z-5 pointer-events-none" animate={{ y: [0, 20, 0], rotate: [0, 15, 0] }} transition={{ duration: 6, repeat: Infinity }}>
-          <Image src="/gif/wish2.gif" alt="wish2" width={112} height={112} unoptimized />
-        </motion.div>
-        <motion.div className="absolute top-1/3 right-20 w-24 h-24 z-5 pointer-events-none" animate={{ y: [0, -15, 0] }} transition={{ duration: 7, repeat: Infinity }}>
-          <Image src="/gif/wish3.gif" alt="wish3" width={96} height={96} unoptimized />
+        <motion.div className="absolute top-1/2 -translate-y-1/2 right-16 w-24 h-24 z-5 pointer-events-none" animate={{ y: [0, 20, 0], rotate: [0, 15, 0] }} transition={{ duration: 6, repeat: Infinity }}>
+          <Image src="/gif/wish2.gif" alt="wish2" width={95} height={95} unoptimized />
         </motion.div>
         
         <motion.div
@@ -90,57 +172,59 @@ export function WishSection() {
 
         {/* Cake */}
         <motion.div
-          className="relative w-80 h-72 mb-16"
+          className="relative w-96 h-80 mb-16"
           initial={{ opacity: 0, scale: 0.8, y: 50 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: 0.3, type: 'spring', stiffness: 100 }}
           whileHover={{ scale: 1.05 }}
         >
-          {/* Cake body */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-52 h-32 bg-gradient-to-b from-[#8B4513] to-[#654321] rounded-b-3xl shadow-2xl">
-            {/* Frosting */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-52 h-8 bg-gradient-to-r from-[#ff6b9d] to-[#ffe6f0] rounded-full" />
+          {/* Center wish GIF - Top of the cake (kept away from the final message) */}
+          <motion.div
+            className="absolute -top-10 left-1/2 -translate-x-1/2 w-24 h-24 z-20 pointer-events-none"
+            animate={{ y: [0, -12, 0] }}
+            transition={{ duration: 7, repeat: Infinity }}
+          >
+            <Image src="/gif/wish3.gif" alt="wish3" width={95} height={95} unoptimized />
+          </motion.div>
+
+          {/* Bottom cake layer */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-24 bg-gradient-to-b from-[#8B4513] via-[#7a3d0a] to-[#5c2e08] rounded-3xl shadow-2xl border-4 border-[#6b340a]">
+            {/* Bottom frosting drip */}
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-64 h-3 bg-gradient-to-r from-[#ff6b9d] via-[#ffb3d9] to-[#ffe6f0] rounded-full blur-sm opacity-80" />
+          </div>
+
+          {/* Middle cake layer */}
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-56 h-24 bg-gradient-to-b from-[#9B5223] via-[#8B4513] to-[#6b340a] rounded-3xl shadow-xl border-4 border-[#7a3d0a]">
+            {/* Middle frosting */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-56 h-4 bg-gradient-to-r from-[#ff6b9d] to-[#ffe6f0] rounded-t-full shadow-md" />
+            {/* Middle frosting drip */}
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-56 h-2 bg-gradient-to-r from-[#ff6b9d] via-[#ffb3d9] to-[#ffe6f0] rounded-full blur-sm opacity-80" />
           </div>
 
           {/* Candles */}
           {[0, 1, 2].map((i) => (
             <motion.div
               key={`candle-${i}`}
-              className="absolute left-1/2 bottom-32 -translate-x-1/2 w-2 h-16 bg-[#ff6b6b] rounded-sm cursor-pointer"
+              className="absolute w-3 h-24 bg-gradient-to-b from-[#fffacd] to-[#fff8dc] rounded-sm cursor-pointer shadow-lg"
               style={{
-                marginLeft: `${(i - 1) * 40}px`,
-                willChange: 'transform'
+                bottom: '160px',
+                left: '50%',
+                marginLeft: `${(i - 1) * 50}px`,
+                transform: 'translateX(-50%)',
+                willChange: 'transform',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3), inset -1px -1px 3px rgba(0, 0, 0, 0.1)'
               }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.2 + 0.5 }}
-              whileHover={{ scale: 1.1 }}
+              whileHover={!candlesBlown ? { scale: 1.08 } : {}}
               onDoubleClick={handleBlow}
             >
-              {/* Flame */}
-              <motion.div
-                ref={(el) => {
-                  if (el) flamesRef.current[i] = el;
-                }}
-                className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-8 bg-gradient-to-b from-[#ffff00] to-[#ff6b6b] rounded-full opacity-1"
-                animate={
-                  !candlesBlown
-                    ? {
-                        scaleY: [1, 1.1, 1],
-                        boxShadow: [
-                          '0 0 10px rgba(255, 255, 0, 0.5)',
-                          '0 0 15px rgba(255, 107, 107, 0.7)',
-                          '0 0 10px rgba(255, 255, 0, 0.5)'
-                        ]
-                      }
-                    : {}
-                }
-                transition={{
-                  duration: 0.3,
-                  repeat: !candlesBlown ? Infinity : 0,
-                  repeatType: 'loop'
-                }}
-              />
+              {/* Candle wick */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-2 bg-gray-600" />
+              
+              {/* Real flame component */}
+              <RealFlame isBlown={candlesBlown} />
             </motion.div>
           ))}
         </motion.div>

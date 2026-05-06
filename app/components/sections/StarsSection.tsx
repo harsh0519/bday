@@ -41,13 +41,31 @@ export function StarsSection() {
     {
       keys: ['m', 'a', 'g', 'i', 'c'],
       action: () => {
-        setMagicMode(!magicMode);
+        setMagicMode(prev => !prev);
+        
+        // Create multiple star cards with all reasons
+        if (magicMode === false) {
+          const allCards = config.loveReasons.map((reason, index) => ({
+            id: Date.now() + index,
+            reason: reason,
+            position: { 
+              x: window.innerWidth * (0.2 + Math.random() * 0.6),
+              y: window.innerHeight * (0.2 + Math.random() * 0.6)
+            }
+          }));
+          setStarCards(allCards);
+        } else {
+          setStarCards([]);
+        }
+        
+        // Trigger brightness flash animation
         if (containerRef.current) {
           gsap.to(containerRef.current, {
-            duration: 0.5,
-            filter: magicMode ? 'brightness(1)' : 'brightness(1.3)',
-            repeat: 1,
-            yoyo: true
+            duration: 0.3,
+            filter: 'brightness(1.5)',
+            repeat: 2,
+            yoyo: true,
+            ease: 'power2.inOut'
           });
         }
       }
@@ -65,12 +83,26 @@ export function StarsSection() {
       }
     >
       <div className="relative w-full min-h-screen">
-        {/* Floating star GIFs */}
-        <motion.div className="absolute top-20 right-16 w-32 h-32 z-5 pointer-events-none" animate={{ y: [0, -25, 0], rotate: [0, 10, 0] }} transition={{ duration: 6, repeat: Infinity }}>
-          <Image src="/gif/star1.gif" alt="star1" width={128} height={128} unoptimized />
+        {/* Floating star GIFs - Center positioned */}
+        <motion.div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-80 w-40 h-40 z-5 pointer-events-none" animate={{ y: [0, -25, 0], rotate: [0, 10, 0] }} transition={{ duration: 6, repeat: Infinity }}>
+          <Image src="/gif/star1.gif" alt="star1" width={155} height={155} unoptimized />
         </motion.div>
-        <motion.div className="absolute bottom-32 right-1/4 w-28 h-28 z-5 pointer-events-none" animate={{ y: [0, 20, 0], rotate: [0, -8, 0] }} transition={{ duration: 7, repeat: Infinity }}>
-          <Image src="/gif/star2.gif" alt="star2" width={112} height={112} unoptimized />
+        <motion.div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-64 w-36 h-36 z-5 pointer-events-none" animate={{ y: [0, 20, 0], rotate: [0, -8, 0] }} transition={{ duration: 7, repeat: Infinity }}>
+          <Image src="/gif/star2.gif" alt="star2" width={145} height={145} unoptimized />
+        </motion.div>
+
+        {/* Spread intro.gif around the section */}
+        <motion.div className="absolute top-20 left-16 w-32 h-32 z-5 pointer-events-none" animate={{ y: [0, -15, 0] }} transition={{ duration: 5, repeat: Infinity }}>
+          <Image src="/gif/intro.gif" alt="intro-left" width={130} height={130} unoptimized />
+        </motion.div>
+        <motion.div className="absolute top-20 right-16 w-32 h-32 z-5 pointer-events-none" animate={{ y: [0, -15, 0] }} transition={{ duration: 5.5, repeat: Infinity }}>
+          <Image src="/gif/intro2.gif" alt="intro-right" width={130} height={130} unoptimized />
+        </motion.div>
+        <motion.div className="absolute bottom-20 left-1/4 w-28 h-28 z-5 pointer-events-none" animate={{ y: [0, 15, 0], rotate: [0, 10, 0] }} transition={{ duration: 6, repeat: Infinity }}>
+          <Image src="/gif/intro3.gif" alt="intro-bottom-left" width={110} height={110} unoptimized />
+        </motion.div>
+        <motion.div className="absolute bottom-20 right-1/4 w-28 h-28 z-5 pointer-events-none" animate={{ y: [0, 15, 0], rotate: [0, -10, 0] }} transition={{ duration: 6, repeat: Infinity }}>
+          <Image src="/gif/intro4.gif" alt="intro-bottom-right" width={110} height={110} unoptimized />
         </motion.div>
         
         <motion.div
@@ -85,10 +117,17 @@ export function StarsSection() {
             WebkitTextFillColor: 'transparent'
           }}
         >
-          Why I Love You
+          Why I Like You
         </motion.div>
 
-        <div className="absolute inset-0 z-5" onClick={handleClick} />
+        {/* Clickable area with visual feedback */}
+        <div 
+          className="absolute inset-0 z-5 cursor-pointer hover:bg-[#ff6b9d]/5 transition-all duration-300" 
+          onClick={handleClick}
+          style={{
+            backgroundImage: 'radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 107, 157, 0.1) 0%, transparent 80%)'
+          }}
+        />
 
         <AnimatePresence>
           {starCards.map((card) => (
@@ -115,7 +154,7 @@ export function StarsSection() {
 
         {config.loveReasons.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center text-gray-400 z-10">
-            <p>Add love reasons to see them here!</p>
+            <p>Add Like reasons to see them here!</p>
           </div>
         )}
 
@@ -134,7 +173,7 @@ export function StarsSection() {
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            Click anywhere to reveal reasons why I love you ✨
+            Click anywhere to reveal reasons why I Like you ✨
           </motion.p>
         )}
       </div>

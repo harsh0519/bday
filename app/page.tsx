@@ -5,7 +5,6 @@ import { AnimatePresence } from 'framer-motion';
 import Lenis from '@studio-freight/lenis';
 import { ScrollTrigger } from '@/lib/gsap';
 import { CustomCursor, AudioPlayer, PageLoader } from '@/components/ui';
-import { DebugPanel } from '@/components/ui/DebugPanel';
 import {
   IntroSection,
   TimelineSection,
@@ -98,7 +97,6 @@ export default function Home() {
 
       {!isLoading && (
         <>
-          {process.env.NODE_ENV === 'development' && <DebugPanel />}
           <CustomCursor />
           <AudioPlayer musicUrl={config.musicUrl} />
 
@@ -107,7 +105,6 @@ export default function Home() {
           {config.memories.length > 0 && <GallerySection key="gallery" />}
           <TimelineSection key="timeline" />
           <StarsSection key="stars" />
-          {config.letterContent && <LoveLetterSection key="letter" />}
           {config.finalMessage && <WishSection key="wish" />}
         </>
       )}

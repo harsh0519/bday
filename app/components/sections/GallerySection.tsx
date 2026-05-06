@@ -8,40 +8,16 @@ import { motion } from 'framer-motion';
 
 const DEMO_IMAGES = [
   {
-    src: 'https://placedog.net/650/900?id=1',
-    title: 'First Smile'
+    src: '/gsec/WhatsApp Image 2026-05-07 at 02.52.06 (1).jpeg'
   },
   {
-    src: 'https://placedog.net/650/900?id=2',
-    title: 'Coffee Date'
+    src: '/gsec/WhatsApp Image 2026-05-07 at 02.52.06.jpeg'
   },
   {
-    src: 'https://placedog.net/650/900?id=3',
-    title: 'Sunset Walk'
+    src: '/gsec/WhatsApp Image 2026-05-07 at 02.52.07.jpeg'
   },
   {
-    src: 'https://placedog.net/650/900?id=4',
-    title: 'Movie Night'
-  },
-  {
-    src: 'https://placedog.net/650/900?id=5',
-    title: 'Rainy Day'
-  },
-  {
-    src: 'https://placedog.net/650/900?id=6',
-    title: 'Road Trip'
-  },
-  {
-    src: 'https://placedog.net/650/900?id=7',
-    title: 'Golden Hour'
-  },
-  {
-    src: 'https://placedog.net/650/900?id=8',
-    title: 'Silly Moment'
-  },
-  {
-    src: 'https://placedog.net/650/900?id=9',
-    title: 'Forever Us'
+    src: '/gsec/WhatsApp Image 2026-05-07 at 02.53.54.jpeg'
   }
 ] as const;
 
@@ -137,7 +113,7 @@ export function GallerySection() {
         >
           {DEMO_IMAGES.map((image, i) => (
             <div
-              key={`${image.title}-${i}`}
+              key={i}
               className="gallery-panel relative flex min-h-screen w-screen flex-shrink-0 items-center justify-center px-4 sm:px-8"
               style={{
                 background: `linear-gradient(135deg, rgba(10,0,8,0.72) 0%, rgba(10,0,8,0.88) 65%)`
@@ -155,34 +131,21 @@ export function GallerySection() {
                 ))}
               <motion.figure
                 className="gallery-figure group relative h-[68vh] max-h-[760px] w-[76vw] max-w-[520px] origin-center scale-[0.76] overflow-hidden rounded-2xl border border-white/20 bg-black/40 shadow-[0_35px_120px_rgba(0,0,0,0.55)] sm:h-[76vh] sm:w-[44vw]"
-                animate={{
-                  rotate: [0, i % 2 === 0 ? 1.6 : -1.6, 0],
-                  x: [0, i % 2 === 0 ? 8 : -8, 0],
-                  y: [0, i % 3 === 0 ? -6 : 6, 0]
-                }}
-                transition={{
-                  duration: 2.8 + (i % 3) * 0.5,
-                  repeat: Infinity,
-                  repeatType: 'mirror',
-                  ease: 'easeInOut'
-                }}
                 whileHover={{ scale: 0.8, boxShadow: '0 40px 130px rgba(0,0,0,0.6)' }}
+                transition={{ duration: 0.3 }}
               >
                 <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                   <span className="absolute -left-1/2 top-0 h-full w-1/2 bg-gradient-to-r from-white/0 via-white/35 to-white/0 blur-sm animate-[gallery-shine_1.4s_ease-in-out_infinite]" />
                 </span>
                 <Image
                   src={image.src}
-                  alt={image.title}
+                  alt="Gallery moment"
                   fill
                   className="object-cover"
                   sizes="(max-width: 640px) 76vw, 44vw"
                   priority={i < 2}
                   unoptimized
                 />
-                <figcaption className="absolute bottom-4 left-4 rounded-full bg-black/65 px-4 py-2 text-sm tracking-wide text-white/95 backdrop-blur-sm">
-                  {image.title}
-                </figcaption>
               </motion.figure>
             </div>
           ))}
@@ -198,7 +161,7 @@ export function GallerySection() {
               WebkitTextFillColor: 'transparent'
             }}
           >
-            Our Moments
+            Our Memories
           </h2>
         </div>
       </div>

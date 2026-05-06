@@ -19,12 +19,12 @@ export const config = {
     { date: '2024-12-25', title: 'Christmas', emoji: '🎄', description: 'Our first Christmas together', note: 'You made it so special' }
   ] as Memory[],
   loveReasons: [
-    'You make me smile every single day',
-    'Your kindness and compassion',
-    'Your infectious laugh that brightens my day',
-    'The way you support my dreams',
-    'Your thoughtfulness and attention to detail',
-    'How safe I feel when I\'m with you'
+    'You\'re the friend who makes everything lighter',
+    'You hype me up and keep me grounded',
+    'You show up—always, no questions asked',
+    'You turn boring days into core memories',
+    'You\'re honest with me (even when I need it)',
+    'With you, I can be 100% myself'
   ] as string[],
   photos: [
     { caption: 'Our first photo together 📸' },
@@ -33,6 +33,6 @@ export const config = {
     { caption: 'You and me forever 💕' }
   ] as Photo[],
   letterContent: 'My dearest love, every moment with you is a gift. You bring joy, laughter, and warmth into my life in ways I never imagined possible. I am grateful for your love, your support, and your unwavering presence in my life. Happy Birthday to the person who makes every day special. Forever yours. 💕',
-  finalMessage: 'Happy Birthday, My Love! 🎉 You deserve all the happiness in the world!',
-  musicUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+  finalMessage: 'Happy Birthday, Bestie! 🎉 Thanks for being my person—today is all about you 💛',
+  musicUrl: '/nastelbom-happy-birthday-471481.mp3'
 } as const;
