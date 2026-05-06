@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
 import { config } from '@/config';
@@ -70,6 +71,11 @@ export function LoveLetterSection() {
         ref={containerRef}
         className="min-h-screen w-full flex items-center justify-center relative z-10"
       >
+        {/* Love Letter GIF */}
+        <motion.div className="absolute -top-20 right-1/3 w-40 h-40 z-5 pointer-events-none" animate={{ y: [0, -20, 0], scale: [1, 1.05, 1] }} transition={{ duration: 5, repeat: Infinity }}>
+          <Image src="/gif/lovelettersection.gif" alt="love letter" width={160} height={160} unoptimized />
+        </motion.div>
+        
         <motion.div
           className="absolute top-12 left-12 text-5xl font-bold"
           initial={{ opacity: 0, x: -50 }}

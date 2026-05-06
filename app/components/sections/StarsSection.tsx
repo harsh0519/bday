@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
 import { config } from '@/config';
@@ -64,6 +65,14 @@ export function StarsSection() {
       }
     >
       <div className="relative w-full min-h-screen">
+        {/* Floating star GIFs */}
+        <motion.div className="absolute top-20 right-16 w-32 h-32 z-5 pointer-events-none" animate={{ y: [0, -25, 0], rotate: [0, 10, 0] }} transition={{ duration: 6, repeat: Infinity }}>
+          <Image src="/gif/star1.gif" alt="star1" width={128} height={128} unoptimized />
+        </motion.div>
+        <motion.div className="absolute bottom-32 right-1/4 w-28 h-28 z-5 pointer-events-none" animate={{ y: [0, 20, 0], rotate: [0, -8, 0] }} transition={{ duration: 7, repeat: Infinity }}>
+          <Image src="/gif/star2.gif" alt="star2" width={112} height={112} unoptimized />
+        </motion.div>
+        
         <motion.div
           className="absolute top-12 left-12 text-5xl font-bold z-10 pointer-events-none"
           initial={{ opacity: 0, x: -50 }}

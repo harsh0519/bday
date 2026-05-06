@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
 import { useEasterEggs } from '@/lib/useEasterEggs';
@@ -146,6 +147,17 @@ export function IntroSection() {
 
       {/* Bottom Center Enter Button */}
       <div className="absolute bottom-16 z-20">
+      
+        {/* Floating GIF decorations */}
+        <motion.div className="absolute -top-32 right-20 w-32 h-32 z-5 pointer-events-none" animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }} transition={{ duration: 5, repeat: Infinity }}>
+          <Image src="/gif/intro.gif" alt="intro" width={128} height={128} unoptimized />
+        </motion.div>
+        <motion.div className="absolute -bottom-20 left-16 w-28 h-28 z-5 pointer-events-none" animate={{ y: [0, 15, 0], rotate: [0, -5, 0] }} transition={{ duration: 6, repeat: Infinity }}>
+          <Image src="/gif/intro2.gif" alt="intro2" width={112} height={112} unoptimized />
+        </motion.div>
+        <motion.div className="absolute top-40 right-1/4 w-24 h-24 z-5 pointer-events-none" animate={{ y: [0, -15, 0] }} transition={{ duration: 7, repeat: Infinity }}>
+          <Image src="/gif/intro3.gif" alt="intro3" width={96} height={96} unoptimized />
+        </motion.div>
         <motion.button
           className="px-10 py-4 text-lg font-semibold rounded-full bg-gradient-to-r from-[#ff6b9d] to-[#ffd700] text-black cursor-pointer border-none hover:border-none focus:outline-none"
           initial={{ opacity: 0, y: 20 }}

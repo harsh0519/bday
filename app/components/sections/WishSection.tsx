@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
 import { config } from '@/config';
@@ -61,6 +62,17 @@ export function WishSection() {
         ref={pageRef}
         className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden z-10"
       >
+        {/* Floating wish GIFs */}
+        <motion.div className="absolute top-20 left-12 w-32 h-32 z-5 pointer-events-none" animate={{ y: [0, -20, 0] }} transition={{ duration: 5, repeat: Infinity }}>
+          <Image src="/gif/wish1.gif" alt="wish1" width={128} height={128} unoptimized />
+        </motion.div>
+        <motion.div className="absolute bottom-20 right-16 w-28 h-28 z-5 pointer-events-none" animate={{ y: [0, 20, 0], rotate: [0, 15, 0] }} transition={{ duration: 6, repeat: Infinity }}>
+          <Image src="/gif/wish2.gif" alt="wish2" width={112} height={112} unoptimized />
+        </motion.div>
+        <motion.div className="absolute top-1/3 right-20 w-24 h-24 z-5 pointer-events-none" animate={{ y: [0, -15, 0] }} transition={{ duration: 7, repeat: Infinity }}>
+          <Image src="/gif/wish3.gif" alt="wish3" width={96} height={96} unoptimized />
+        </motion.div>
+        
         <motion.div
           className="absolute top-12 left-12 text-5xl font-bold"
           initial={{ opacity: 0, x: -50 }}
