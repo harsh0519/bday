@@ -126,6 +126,9 @@ export function WishSection() {
   ]);
 
   const handleBlow = async () => {
+    // Start music on a direct user gesture (helps with autoplay restrictions)
+    window.dispatchEvent(new Event('bday:audio:play'));
+
     setCandlesBlown(true);
 
     // Wait then explode confetti/balloons
@@ -154,7 +157,7 @@ export function WishSection() {
         <motion.div className="absolute top-1/2 -translate-y-1/2 right-16 w-24 h-24 z-5 pointer-events-none" animate={{ y: [0, 20, 0], rotate: [0, 15, 0] }} transition={{ duration: 6, repeat: Infinity }}>
           <Image src="/gif/wish2.gif" alt="wish2" width={95} height={95} unoptimized />
         </motion.div>
-        
+
         <motion.div
           className="absolute top-12 left-12 text-5xl font-bold"
           initial={{ opacity: 0, x: -50 }}
@@ -222,7 +225,7 @@ export function WishSection() {
             >
               {/* Candle wick */}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-2 bg-gray-600" />
-              
+
               {/* Real flame component */}
               <RealFlame isBlown={candlesBlown} />
             </motion.div>
@@ -233,35 +236,54 @@ export function WishSection() {
         <motion.button
           onClick={handleBlow}
           disabled={candlesBlown}
-          className="px-8 py-4 text-xl font-bold rounded-full bg-gradient-to-r from-[#ff6b9d] to-[#ffd700] text-black mb-8 disabled:opacity-50 disabled:cursor-not-allowed"
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1 }}
-          whileHover={!candlesBlown ? { scale: 1.05 } : {}}
-          whileTap={!candlesBlown ? { scale: 0.95 } : {}}
+          className="relative z-10 px-10 py-4 text-lg font-bold rounded-full text-amber-950
+        disabled:opacity-60 disabled:cursor-not-allowed disabled:saturate-50"
           style={{
-            boxShadow: '0 0 20px rgba(255, 107, 157, 0.5)',
-            willChange: 'transform'
+            background: 'linear-gradient(135deg, #ffdb85 0%, #ff9f56 40%, #ff6b9d 100%)',
+            boxShadow: 'inset 0 2px 0 #ffe3b3, inset 0 -2px 0 #c94e2a',
+            fontFamily: "'Playfair Display', serif",
+            padding: '0.5rem',
           }}
+          whileHover={!candlesBlown ? { scale: 1.05, y: -2 } : {}}
+          whileTap={!candlesBlown ? { scale: 0.97, y: 1 } : {}}
         >
-          {candlesBlown ? '🎉 Made a Wish!' : 'Blow Out the Candles'}
+          {candlesBlown ? '🎉' : 'Blow Out the Candles'}
         </motion.button>
-
         {/* Final Message */}
         {candlesBlown && (
           <motion.div
-            className="text-4xl font-bold text-center max-w-2xl px-4 absolute bottom-20"
-            style={{
-              background: 'linear-gradient(120deg, #ff6b9d, #ffd700)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
+            className="absolute bottom-16 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 flex flex-col items-center gap-5"
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 1 }}
           >
-            {config.finalMessage}
+            <div
+              className="text-3xl md:text-4xl font-bold text-center"
+              style={{
+                background: 'linear-gradient(120deg, #ff6b9d, #ffd700)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}
+            >
+              {config.finalMessage}
+            </div>
+
+            <motion.a
+              href="https://youtu.be/z1VdU6ZwRwY?si=TBcU_d6_sJcj2avD"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-7 py-3 md:px-8 md:py-3 rounded-full font-bold text-black bg-gradient-to-r from-[#ff6b9d] to-[#ffd700] ring-1 ring-white/10 shadow-lg shadow-black/30"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              style={
+                {
+                  padding:'0.5rem'
+                }
+              }
+            >
+              A little song for you 🎶
+            </motion.a>
           </motion.div>
         )}
       </div>

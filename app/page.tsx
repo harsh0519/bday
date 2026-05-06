@@ -10,7 +10,6 @@ import {
   TimelineSection,
   StarsSection,
   GallerySection,
-  LoveLetterSection,
   WishSection
 } from '@/components/sections';
 import { config } from '@/config';

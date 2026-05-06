@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
 import { useEasterEggs } from '@/lib/useEasterEggs';
@@ -145,33 +144,38 @@ export function IntroSection() {
         {/* Text will be populated by GSAP animation */}
       </motion.div>
 
-      {/* Bottom Center Enter Button */}
-      <div className="absolute bottom-16 z-20">
-      
-
-        <motion.button
-          className="px-10 py-4 text-lg font-semibold rounded-full bg-gradient-to-r from-[#ff6b9d] to-[#ffd700] text-black cursor-pointer border-none hover:border-none focus:outline-none"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 8, duration: 0.8, type: 'spring', stiffness: 100 }}
-          whileHover={{ 
-            scale: 1.1, 
-            boxShadow: '0 0 40px rgba(255, 107, 157, 0.9), 0 0 60px rgba(255, 215, 0, 0.6)' 
-          }}
-          whileTap={{ scale: 0.95 }}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            window.scrollTo?.({ top: window.innerHeight, behavior: 'smooth' });
-          }}
-          type="button"
-          onDoubleClick={() => {
-            // Easter egg: shake effect - disabled for now
+      {/* Bottom Center Scroll Hint */}
+      <motion.div
+        className="absolute bottom-14 z-20 flex flex-col items-center gap-2 select-none pointer-events-none"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 8, duration: 0.8, type: 'spring', stiffness: 90 }}
+      >
+        <div
+          className="text-sm md:text-base font-semibold"
+          style={{
+            background: 'linear-gradient(120deg, #ff6b9d, #ffd700)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
           }}
         >
-          Enter ✨
-        </motion.button>
-      </div>
+          Scroll down
+        </div>
+        <motion.div
+          className="text-2xl"
+          style={{
+            background: 'linear-gradient(120deg, #ff6b9d, #ffd700)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          ↓
+        </motion.div>
+      </motion.div>
 
       {/* Cute floating hearts overlay */}
       {heartPositions.map((pos, i) => (

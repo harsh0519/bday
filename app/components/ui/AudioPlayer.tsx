@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { gsap } from '@/lib/gsap';
 import { Howl } from 'howler';
 
+const AUDIO_PLAY_EVENT = 'bday:audio:play';
+
 interface AudioPlayerProps {
   musicUrl?: string;
 }
@@ -16,27 +18,49 @@ export function AudioPlayer({ musicUrl }: AudioPlayerProps) {
   const animationRef = useRef<gsap.core.Tween | null>(null);
   const isEnabled = Boolean(musicUrl);
 
-  useEffect(() => {
-    if (musicUrl && !soundRef.current) {
+  const ensureSound = () => {
+    if (!musicUrl) return;
+
+    if (!soundRef.current) {
       soundRef.current = new Howl({
         src: [musicUrl],
         loop: true,
         volume: 0.5
       });
-
-      return () => {
-        animationRef.current?.kill();
-        soundRef.current?.unload();
-        soundRef.current = null;
-      };
     }
+  };
 
+  useEffect(() => {
     return () => {
       animationRef.current?.kill();
+      soundRef.current?.unload();
+      soundRef.current = null;
     };
   }, [musicUrl]);
 
+  useEffect(() => {
+    if (!isEnabled) return;
+
+    const handlePlay = () => {
+      ensureSound();
+      if (!soundRef.current) return;
+
+      if (!soundRef.current.playing()) {
+        soundRef.current.play();
+        setIsPlaying(true);
+        startVinylAnimation();
+      }
+    };
+
+    window.addEventListener(AUDIO_PLAY_EVENT, handlePlay);
+    return () => {
+      window.removeEventListener(AUDIO_PLAY_EVENT, handlePlay);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEnabled, musicUrl]);
+
   const togglePlay = () => {
+    ensureSound();
     if (!soundRef.current) return;
 
     if (soundRef.current.playing()) {
