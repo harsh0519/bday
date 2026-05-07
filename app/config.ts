@@ -34,5 +34,7 @@ export const config = {
   ] as Photo[],
   letterContent: 'My dearest love, every moment with you is a gift. You bring joy, laughter, and warmth into my life in ways I never imagined possible. I am grateful for your love, your support, and your unwavering presence in my life. Happy Birthday to the person who makes every day special. Forever yours. 💕',
   finalMessage: 'Happy Birthday, Bestie! 🎉 Thanks for being my person—today is all about you 💛',
+  songUrl: 'https://youtu.be/z1VdU6ZwRwY?si=TBcU_d6_sJcj2avD',
+  songButtonText: 'A little song for you 🎶',
   musicUrl: '/nastelbom-happy-birthday-471481.mp3'
 } as const;

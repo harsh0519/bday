@@ -269,21 +269,23 @@ export function WishSection() {
               {config.finalMessage}
             </div>
 
-            <motion.a
-              href="https://youtu.be/z1VdU6ZwRwY?si=TBcU_d6_sJcj2avD"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-7 py-3 md:px-8 md:py-3 rounded-full font-bold text-black bg-gradient-to-r from-[#ff6b9d] to-[#ffd700] ring-1 ring-white/10 shadow-lg shadow-black/30"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.97 }}
-              style={
-                {
-                  padding:'0.5rem'
+            {config.songUrl && (
+              <motion.a
+                href={config.songUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-7 py-3 md:px-8 md:py-3 rounded-full font-bold text-black bg-gradient-to-r from-[#ff6b9d] to-[#ffd700] ring-1 ring-white/10 shadow-lg shadow-black/30"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+                style={
+                  {
+                    padding:'0.5rem'
+                  }
                 }
-              }
-            >
-              A little song for you 🎶
-            </motion.a>
+              >
+                {config.songButtonText}
+              </motion.a>
+            )}
           </motion.div>
         )}
       </div>

@@ -13,9 +13,11 @@ export function createStarField(count: number = 1000) {
 
   // Color palette
   const colorPalette = [
-    { r: 1, g: 0.8, b: 1 }, // pink
-    { r: 1, g: 1, b: 1 },     // white
-    { r: 1, g: 0.84, b: 0 }   // gold
+    { r: 1, g: 0, b: 0 },  // #ff6b9d
+
+    // { r: 1, g: 0.8, b: 1 }, // pink
+    // { r: 1, g: 1, b: 1 },     // white
+    // { r: 1, g: 0.84, b: 0 }   // gold
   ];
 
   for (let i = 0; i < count; i++) {
@@ -38,7 +40,8 @@ export function createStarField(count: number = 1000) {
   const material = new THREE.PointsMaterial({
     size: 1,
     vertexColors: true,
-    sizeAttenuation: true
+    sizeAttenuation: true,
+      color: 0xffffff 
   });
 
   return new THREE.Points(geometry, material);
@@ -53,6 +56,7 @@ export function createParticles(particleCount: number = 500) {
 
   const colorPalette = [
     { r: 1, g: 0.42, b: 0.61 },  // #ff6b9d
+    // { r: 1, g: 0, b: 0 },  // #ff6b9d
     { r: 1, g: 0.84, b: 0 }      // #ffd700
   ];
 
@@ -87,7 +91,8 @@ export function createParticles(particleCount: number = 500) {
   const material = new THREE.PointsMaterial({
     size: 2,
     vertexColors: true,
-    sizeAttenuation: true
+    sizeAttenuation: true,
+      color: 0xffffff 
   });
 
   const points = new THREE.Points(geometry, material) as PointsWithAnimation;
